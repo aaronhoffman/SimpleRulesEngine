@@ -161,7 +161,6 @@ namespace SimpleRulesEngine.Tests
         }
     }
 
-
     public class ValueExtractorTestsContextClass
     {
         public ValueExtractorTestsClass TestClass { get; set; }

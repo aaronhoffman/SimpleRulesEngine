@@ -16,21 +16,21 @@
 
 
         /// <summary>
-        /// This option is valid when the left argument is an array and the right argument is an array.
+        /// This option is valid when both the left argument and the right argument are arrays.
         /// </summary>
         ContainsAny = 3,
 
         /// <summary>
-        /// This option is valid when the left argument is an array and the right argument is an array.
+        /// This option is valid when both the left argument and the right argument are arrays.
         /// </summary>
         DoesNotContainAny = 4,
 
         /// <summary>
-        /// This option is valid when the left argument is an array and the right argument is an array.
+        /// This option is valid when both the left argument and the right argument are arrays.
         /// </summary>
         ContainsAll = 5,
 
-        // todo: opportunity to consolidate with PerformArraysComparison
+        // todo: opportunity to consolidate.
         // e.g `IsAny` can be translated to `ContainsAny`
     }
 

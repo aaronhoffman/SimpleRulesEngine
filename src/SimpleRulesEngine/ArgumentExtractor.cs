@@ -42,9 +42,9 @@ namespace SimpleRulesEngine
                 case ParameterType.ArrayAggregation:
                     return ExtractSingleValueArgumentForArrayAggregation(parameterDefinition, context);
                 case ParameterType.Array:
-                    throw new SimpleRulesEngineException("Array parameter type is invalid. Can not convert to value argument. Perhaps `ArrayAggregation` was the intended type?");
+                    throw new SimpleRulesEngineException("Array ParameterType is invalid. Can not convert to value argument. Perhaps `ArrayAggregation` was the intended type?");
                 default:
-                    throw new SimpleRulesEngineException("Expression Parameter Type is not supported.");
+                    throw new SimpleRulesEngineException("Parameter Type is not supported.");
             }
         }
 
@@ -52,7 +52,7 @@ namespace SimpleRulesEngine
         {
             if (!parameterDefinition.ParameterType.IsArrayParameterType())
             {
-                throw new SimpleRulesEngineException("Parameter Type is not Array. Array Argument can not be created.");
+                throw new SimpleRulesEngineException("ParameterType is not Array. Array Argument can not be extracted.");
             }
 
             ValidateValueSource(parameterDefinition);

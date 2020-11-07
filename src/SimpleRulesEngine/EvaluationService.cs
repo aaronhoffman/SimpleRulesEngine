@@ -7,8 +7,9 @@ namespace SimpleRulesEngine
     public interface IEvaluationService
     {
         /// <summary>
+        /// Evaluate the ExpressionDefinition given the provided context.
         /// If a single context object is provided, it is the context for both the left and the right arguments.
-        /// You only need to provide a context if one is required.
+        /// If an ExpressionDefinition uses only constant values, a context is not required.
         /// </summary>
         /// <param name="expressionDefinition"></param>
         /// <param name="context"></param>
@@ -46,75 +47,108 @@ namespace SimpleRulesEngine
 
             if (BothParametersAreSingleValues(expressionDefinition))
             {
-                return EvaluateSingleValuesComparisonExpression(expressionDefinition, leftContext, rightContext);
+                return EvaluateLeftSingleValueRightSingleValueExpression(expressionDefinition, leftContext, rightContext);
             }
             else if (BothParametersAreArrays(expressionDefinition))
             {
-                return EvaluateArraysComparisonExpression(expressionDefinition, leftContext, rightContext);
+                return EvaluateLeftArrayRightArrayExpression(expressionDefinition, leftContext, rightContext);
             }
             else if (expressionDefinition.LeftParameter.ParameterType.IsArrayParameterType())
             {
-                return EvaluateLeftArrayComparisonExpression(expressionDefinition, leftContext, rightContext);
+                return EvaluateLeftArrayRightSingleValueExpression(expressionDefinition, leftContext, rightContext);
             }
             else if (expressionDefinition.RightParameter.ParameterType.IsArrayParameterType())
             {
-                return EvaluateRightArrayComparisonExpression(expressionDefinition, leftContext, rightContext);
+                return EvaluateLeftSingleValueRightArrayComparisonExpression(expressionDefinition, leftContext, rightContext);
             }
 
             throw new SimpleRulesEngineException("Parameter type combination is not supported.");
         }
 
-        private bool EvaluateSingleValuesComparisonExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
+        private bool EvaluateLeftSingleValueRightSingleValueExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
         {
+            if (!expressionDefinition.LeftParameter.ParameterType.IsSingleValueParameterType())
+            {
+                throw new SimpleRulesEngineException("ParameterType of the left parameter is not a valid single value type.");
+            }
+
+            if (!expressionDefinition.RightParameter.ParameterType.IsSingleValueParameterType())
+            {
+                throw new SimpleRulesEngineException("ParameterType of the right parameter is not a valid single value type.");
+            }
+
             var leftArgument = _argumentExtractor.ExtractSingleValueArgument(expressionDefinition.LeftParameter, leftContext);
 
             var rightArgument = _argumentExtractor.ExtractSingleValueArgument(expressionDefinition.RightParameter, rightContext);
 
-            return _expressionEvaluator.PerformSingleValuesComparison(expressionDefinition, leftArgument, rightArgument);
+            return _expressionEvaluator.EvaluateLeftSingleValueRightSingleValueExpression(expressionDefinition, leftArgument, rightArgument);
         }
 
-        private bool EvaluateArraysComparisonExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
+        private bool EvaluateLeftArrayRightArrayExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
         {
+            if (!expressionDefinition.LeftParameter.ParameterType.IsArrayParameterType())
+            {
+                throw new SimpleRulesEngineException("The ParameterType of the Left Parameter is not a valid array type.");
+            }
+
+            if (!expressionDefinition.RightParameter.ParameterType.IsArrayParameterType())
+            {
+                throw new SimpleRulesEngineException("The ParameterType of the Right Parameter is not a valid array type.");
+            }
+
+            if (!expressionDefinition.ArrayComparison.HasValue)
+            {
+                throw new SimpleRulesEngineException("Both the Left and Right parameters are array type but a valid ArrayComparison was not provided.");
+            }
+
             if (!expressionDefinition.ArrayComparison.IsValidArraysComparison())
             {
-                throw new SimpleRulesEngineException("Array Comparison not valid.");
+                throw new SimpleRulesEngineException($"Array Comparison of [{expressionDefinition.ArrayComparison.Value.ToString()}] not valid when both parameters are arrays.");
             }
 
             var leftArgument = _argumentExtractor.ExtractArrayArgument(expressionDefinition.LeftParameter, leftContext);
 
             var rightArgument = _argumentExtractor.ExtractArrayArgument(expressionDefinition.RightParameter, rightContext);
 
-            return _expressionEvaluator.PerformArraysComparison(expressionDefinition, leftArgument, rightArgument);
+            return _expressionEvaluator.EvaluateLeftArrayRightArrayExpression(expressionDefinition, leftArgument, rightArgument);
         }
 
-        private bool EvaluateLeftArrayComparisonExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
+        private bool EvaluateLeftArrayRightSingleValueExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
         {
-            if (!expressionDefinition.LeftParameter.ParameterType.IsArrayParameterType()
-                || expressionDefinition.RightParameter.ParameterType.IsArrayParameterType())
+            if (!expressionDefinition.LeftParameter.ParameterType.IsArrayParameterType())
             {
-                throw new SimpleRulesEngineException("Parameter types are not valid for this type of comparison.");
+                throw new SimpleRulesEngineException("The ParameterType of the Left Parameter is not a valid array type.");
+            }
+
+            if (!expressionDefinition.RightParameter.ParameterType.IsSingleValueParameterType())
+            {
+                throw new SimpleRulesEngineException("The ParameterType of the Right Parameter is not a valid single value type.");
             }
 
             var leftArgument = _argumentExtractor.ExtractArrayArgument(expressionDefinition.LeftParameter, leftContext);
 
             var rightArgument = _argumentExtractor.ExtractSingleValueArgument(expressionDefinition.RightParameter, rightContext);
 
-            return _expressionEvaluator.PerformLeftArrayComparison(expressionDefinition, leftArgument, rightArgument);
+            return _expressionEvaluator.EvaluateLeftArrayRightSingleValueExpression(expressionDefinition, leftArgument, rightArgument);
         }
 
-        private bool EvaluateRightArrayComparisonExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
+        private bool EvaluateLeftSingleValueRightArrayComparisonExpression(ExpressionDefinition expressionDefinition, object leftContext, object rightContext)
         {
-            if (expressionDefinition.LeftParameter.ParameterType.IsArrayParameterType()
-                || !expressionDefinition.RightParameter.ParameterType.IsArrayParameterType())
+            if (!expressionDefinition.LeftParameter.ParameterType.IsSingleValueParameterType())
             {
-                throw new SimpleRulesEngineException("Parameter types are not valid for this type of comparison.");
+                throw new SimpleRulesEngineException("The ParameterType of the Left Parameter is not a valid single value type.");
+            }
+
+            if (!expressionDefinition.RightParameter.ParameterType.IsArrayParameterType())
+            {
+                throw new SimpleRulesEngineException("The ParameterType of the Right Parameter is not a valid array type.");
             }
 
             var leftArgument = _argumentExtractor.ExtractSingleValueArgument(expressionDefinition.LeftParameter, leftContext);
 
             var rightArgument = _argumentExtractor.ExtractArrayArgument(expressionDefinition.RightParameter, rightContext);
 
-            return _expressionEvaluator.PerformRightArrayComparison(expressionDefinition, leftArgument, rightArgument);
+            return _expressionEvaluator.EvaluateLeftSingleValueRightArrayExpression(expressionDefinition, leftArgument, rightArgument);
         }
 
         private bool BothParametersAreSingleValues(ExpressionDefinition expressionDefinition)

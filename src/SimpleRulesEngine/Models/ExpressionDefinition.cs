@@ -13,16 +13,19 @@
         public ExpressionAggregationMethod? ExpressionAggregationMethod { get; set; }
 
         /// <summary>
-        /// Either NumericComparison or TextComparison must be provided.
+        /// Either `NumericComparison` or `TextComparison` must be provided.
         /// </summary>
         public NumericComparison? NumericComparison { get; set; }
 
         /// <summary>
-        /// Either TextComparison or NumericComparison must be provided.
+        /// Either `TextComparison` or `NumericComparison` must be provided.
         /// </summary>
         public TextComparison? TextComparison { get; set; }
 
-        // For ArrayComparison, Either both sides are an array and we are testing some Intersection, or only the right side is an array.
+        /// <summary>
+        /// Must be provided if both the left and right arguments are arrays,
+        /// or the left argument is a single value and the right argument is an array.
+        /// </summary>
         public ArrayComparison? ArrayComparison { get; set; }
     }
 }

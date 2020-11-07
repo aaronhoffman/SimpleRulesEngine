@@ -16,7 +16,7 @@ namespace SimpleRulesEngine.Tests
         }
 
         [TestMethod]
-        public void Evaluator_GivenSingleValues_EvaluatesCorrectly()
+        public void Evaluator_GivenLeftSingleValueAndRightSingleValue_EvaluatesCorrectly()
         {
             var ed = new ExpressionDefinition();
 
@@ -60,7 +60,7 @@ namespace SimpleRulesEngine.Tests
         }
 
         [TestMethod]
-        public void Evaluator_GivenRightParameterArray_EvaluatesCorrectly()
+        public void Evaluator_GivenLeftSingleValueAndRightArray_EvaluatesCorrectly()
         {
             var ed = new ExpressionDefinition();
 
@@ -94,7 +94,7 @@ namespace SimpleRulesEngine.Tests
         }
 
         [TestMethod]
-        public void Evaluator_GivenLeftParameterArray_EvaluatesCorrectly()
+        public void Evaluator_GivenLeftArrayAndRightSingleValue_EvaluatesCorrectly()
         {
             var ed = new ExpressionDefinition();
 
@@ -171,7 +171,7 @@ namespace SimpleRulesEngine.Tests
         }
 
         [TestMethod]
-        public void Evaluator_GivenBothArrays_EvaluatesCorrectly()
+        public void Evaluator_GivenLeftArrayAndRightArray_EvaluatesCorrectly()
         {
             var ed = new ExpressionDefinition();
             var nla = new object[] { 1, 2, 3 };
@@ -211,38 +211,42 @@ namespace SimpleRulesEngine.Tests
 
         private void TestHelper(ExpressionDefinition ed, NumericComparison numericComparison, object leftArgument, object rightArgument, bool expectedResult)
         {
+            ed.ArrayComparison = null;
+            ed.TextComparison = null;
             ed.NumericComparison = numericComparison;
-            Assert.AreEqual(expectedResult, _target.PerformSingleValuesComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, TextComparison textComparison, object leftArgument, object rightArgument, bool expectedResult)
         {
+            ed.ArrayComparison = null;
+            ed.NumericComparison = null;
             ed.TextComparison = textComparison;
-            Assert.AreEqual(expectedResult, _target.PerformSingleValuesComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, NumericComparison numericComparison, IEnumerable<object> leftArgument, object rightArgument, bool expectedResult)
         {
             ed.NumericComparison = numericComparison;
-            Assert.AreEqual(expectedResult, _target.PerformLeftArrayComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftArrayRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, TextComparison textComparison, IEnumerable<object> leftArgument, object rightArgument, bool expectedResult)
         {
             ed.TextComparison = textComparison;
-            Assert.AreEqual(expectedResult, _target.PerformLeftArrayComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftArrayRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, ArrayComparison arrayComparison, object leftArgument, IEnumerable<object> rightArgument, bool expectedResult)
         {
             ed.ArrayComparison = arrayComparison;
-            Assert.AreEqual(expectedResult, _target.PerformRightArrayComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftSingleValueRightArrayExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, ArrayComparison arrayComparison, IEnumerable<object> leftArgument, IEnumerable<object> rightArgument, bool expectedResult)
         {
             ed.ArrayComparison = arrayComparison;
-            Assert.AreEqual(expectedResult, _target.PerformArraysComparison(ed, leftArgument, rightArgument));
+            Assert.AreEqual(expectedResult, _target.EvaluateLeftArrayRightArrayExpression(ed, leftArgument, rightArgument));
         }
     }
 

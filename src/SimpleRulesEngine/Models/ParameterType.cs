@@ -9,8 +9,8 @@
         Array = 3,
 
         /// <summary>
-        /// Parameter is an array but items will be aggregated into a single numeric value.
-        /// If this option is set on ExpressionParameter, the ArrayAggregessionType must also be provided.
+        /// Parameter is an array but items will be aggregated into a single value.
+        /// Note: If this option is set on ParameterDefinition, the ArrayAggregessionType must also be provided.
         /// </summary>
         ArrayAggregation = 4,
     }

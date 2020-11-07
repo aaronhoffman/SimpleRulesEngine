@@ -8,27 +8,37 @@ namespace SimpleRulesEngine
 {
     public interface IExpressionEvaluator
     {
-        bool PerformSingleValuesComparison(ExpressionDefinition expressionDefinition, object leftArgument, object rightArgument);
+        bool EvaluateLeftSingleValueRightSingleValueExpression(ExpressionDefinition expressionDefinition, object leftArgument, object rightArgument);
 
-        bool PerformArraysComparison(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, IEnumerable<object> rightArgument);
+        bool EvaluateLeftArrayRightArrayExpression(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, IEnumerable<object> rightArgument);
 
-        bool PerformLeftArrayComparison(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, object rightArgument);
+        bool EvaluateLeftArrayRightSingleValueExpression(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, object rightArgument);
 
-        bool PerformRightArrayComparison(ExpressionDefinition expressionDefinition, object leftArgument, IEnumerable<object> rightArgument);
+        bool EvaluateLeftSingleValueRightArrayExpression(ExpressionDefinition expressionDefinition, object leftArgument, IEnumerable<object> rightArgument);
     }
 
     public class ExpressionEvaluator : IExpressionEvaluator
     {
-        public bool PerformSingleValuesComparison(ExpressionDefinition expressionDefinition, object leftArgument, object rightArgument)
+        public bool EvaluateLeftSingleValueRightSingleValueExpression(
+            ExpressionDefinition expressionDefinition,
+            object leftArgument,
+            object rightArgument)
         {
-            // todo: validation could be added here to prevent undesired comparisons (e.g. are Numeric and Text both defined)
+            if (expressionDefinition.NumericComparison.HasValue
+                && expressionDefinition.TextComparison.HasValue)
+            {
+                throw new SimpleRulesEngineException("Both NumericComparison and TextComparison have been set and only one is allowed.");
+            }
 
             if (expressionDefinition.NumericComparison.HasValue)
             {
                 var leftArgumentNumber = Convert.ToDecimal(leftArgument);
                 var rightArgumentNumber = Convert.ToDecimal(rightArgument);
 
-                return PerformSingleValuesComparison(expressionDefinition.NumericComparison.Value, leftArgumentNumber, rightArgumentNumber);
+                return PerformLeftSingleValueRightSingleValueNumericComparison(
+                    expressionDefinition.NumericComparison.Value,
+                    leftArgumentNumber,
+                    rightArgumentNumber);
             }
 
             if (expressionDefinition.TextComparison.HasValue)
@@ -36,17 +46,23 @@ namespace SimpleRulesEngine
                 var leftArgumentText = Convert.ToString(leftArgument);
                 var rightArgumentText = Convert.ToString(rightArgument);
 
-                return PerformSingleValuesComparison(expressionDefinition.TextComparison.Value, leftArgumentText, rightArgumentText);
+                return PerformLeftSingleValueRightSingleValueTextComparison(
+                    expressionDefinition.TextComparison.Value,
+                    leftArgumentText,
+                    rightArgumentText);
             }
 
             throw new SimpleRulesEngineException("Numeric or Text Comparison is required.");
         }
 
-        public bool PerformArraysComparison(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, IEnumerable<object> rightArgument)
+        public bool EvaluateLeftArrayRightArrayExpression(
+            ExpressionDefinition expressionDefinition,
+            IEnumerable<object> leftArgument,
+            IEnumerable<object> rightArgument)
         {
             if (!expressionDefinition.ArrayComparison.HasValue)
             {
-                throw new SimpleRulesEngineException("Can not perform Array Comparison. Array Comparison is not defined.");
+                throw new SimpleRulesEngineException("ArrayComparison was not provided.");
             }
 
             switch (expressionDefinition.ArrayComparison.Value)
@@ -62,23 +78,39 @@ namespace SimpleRulesEngine
             }
         }
 
-        public bool PerformLeftArrayComparison(ExpressionDefinition expressionDefinition, IEnumerable<object> leftArgument, object rightArgument)
+        public bool EvaluateLeftArrayRightSingleValueExpression(
+            ExpressionDefinition expressionDefinition,
+            IEnumerable<object> leftArgument,
+            object rightArgument)
         {
+            if (!expressionDefinition.ExpressionAggregationMethod.HasValue)
+            {
+                throw new SimpleRulesEngineException("ExpressionAggregationMethod not provided.");
+            }
+
             switch (expressionDefinition.ExpressionAggregationMethod)
             {
                 case ExpressionAggregationMethod.All:
-                    return leftArgument.All(x => PerformSingleValuesComparison(expressionDefinition, x, rightArgument));
+                    return leftArgument.All(x => EvaluateLeftSingleValueRightSingleValueExpression(expressionDefinition, x, rightArgument));
                 case ExpressionAggregationMethod.Any:
-                    return leftArgument.Any(x => PerformSingleValuesComparison(expressionDefinition, x, rightArgument));
+                    return leftArgument.Any(x => EvaluateLeftSingleValueRightSingleValueExpression(expressionDefinition, x, rightArgument));
                 default:
                     throw new SimpleRulesEngineException("Expression Aggregation not supported.");
             }
         }
 
-        public bool PerformRightArrayComparison(ExpressionDefinition expressionDefinition, object leftArgument, IEnumerable<object> rightArgument)
+        public bool EvaluateLeftSingleValueRightArrayExpression(
+            ExpressionDefinition expressionDefinition,
+            object leftArgument,
+            IEnumerable<object> rightArgument)
         {
-            // todo: opportunity to consolidate with PerformArraysComparison
+            // todo: opportunity to consolidate.
             // e.g `IsAny` can be translated to `ContainsAny`
+
+            if (!expressionDefinition.ArrayComparison.HasValue)
+            {
+                throw new SimpleRulesEngineException("ArrayComparison must be provided.");
+            }
 
             switch (expressionDefinition.ArrayComparison.Value)
             {
@@ -91,7 +123,10 @@ namespace SimpleRulesEngine
             }
         }
 
-        private bool PerformSingleValuesComparison(NumericComparison numericComparison, decimal leftArgument, decimal rightArgument)
+        private bool PerformLeftSingleValueRightSingleValueNumericComparison(
+            NumericComparison numericComparison,
+            decimal leftArgument,
+            decimal rightArgument)
         {
             switch (numericComparison)
             {
@@ -112,7 +147,10 @@ namespace SimpleRulesEngine
             }
         }
 
-        private bool PerformSingleValuesComparison(TextComparison textComparison, string leftArgument, string rightArgument)
+        private bool PerformLeftSingleValueRightSingleValueTextComparison(
+            TextComparison textComparison,
+            string leftArgument,
+            string rightArgument)
         {
             switch (textComparison)
             {

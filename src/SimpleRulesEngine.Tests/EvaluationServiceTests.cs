@@ -53,14 +53,14 @@ namespace SimpleRulesEngine.Tests
                 .Returns(rightArg);
 
             _expressionEvaluatorMock
-                .Setup(x => x.PerformSingleValuesComparison(ed, leftArg, rightArg))
+                .Setup(x => x.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArg, rightArg))
                 .Returns(true);
 
             _target.Evaluate(ed, leftContext, rightContext);
 
             _argumentExtractorMock.Verify(x => x.ExtractSingleValueArgument(ed.LeftParameter, leftContext), Times.Once);
             _argumentExtractorMock.Verify(x => x.ExtractSingleValueArgument(ed.RightParameter, rightContext), Times.Once);
-            _expressionEvaluatorMock.Verify(x => x.PerformSingleValuesComparison(ed, leftArg, rightArg), Times.Once);
+            _expressionEvaluatorMock.Verify(x => x.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArg, rightArg), Times.Once);
         }
 
         [TestMethod]
@@ -94,15 +94,16 @@ namespace SimpleRulesEngine.Tests
                 .Returns(rightArg);
 
             _expressionEvaluatorMock
-                .Setup(x => x.PerformArraysComparison(ed, leftArg, rightArg))
+                .Setup(x => x.EvaluateLeftArrayRightArrayExpression(ed, leftArg, rightArg))
                 .Returns(true);
 
             _target.Evaluate(ed, leftContext, rightContext);
 
             _argumentExtractorMock.Verify(x => x.ExtractArrayArgument(ed.LeftParameter, leftContext), Times.Once);
             _argumentExtractorMock.Verify(x => x.ExtractArrayArgument(ed.RightParameter, rightContext), Times.Once);
-            _expressionEvaluatorMock.Verify(x => x.PerformArraysComparison(ed, leftArg, rightArg), Times.Once);
+            _expressionEvaluatorMock.Verify(x => x.EvaluateLeftArrayRightArrayExpression(ed, leftArg, rightArg), Times.Once);
         }
+
         [TestMethod]
         public void Evaluate_GivenLeftArray_CallsDependenciesAppropriately()
         {
@@ -133,14 +134,14 @@ namespace SimpleRulesEngine.Tests
                 .Returns(rightArg);
 
             _expressionEvaluatorMock
-                .Setup(x => x.PerformLeftArrayComparison(ed, leftArg, rightArg))
+                .Setup(x => x.EvaluateLeftArrayRightSingleValueExpression(ed, leftArg, rightArg))
                 .Returns(true);
 
             _target.Evaluate(ed, leftContext, rightContext);
 
             _argumentExtractorMock.Verify(x => x.ExtractArrayArgument(ed.LeftParameter, leftContext), Times.Once);
             _argumentExtractorMock.Verify(x => x.ExtractSingleValueArgument(ed.RightParameter, rightContext), Times.Once);
-            _expressionEvaluatorMock.Verify(x => x.PerformLeftArrayComparison(ed, leftArg, rightArg), Times.Once);
+            _expressionEvaluatorMock.Verify(x => x.EvaluateLeftArrayRightSingleValueExpression(ed, leftArg, rightArg), Times.Once);
         }
 
         [TestMethod]
@@ -173,14 +174,14 @@ namespace SimpleRulesEngine.Tests
                 .Returns(rightArg);
 
             _expressionEvaluatorMock
-                .Setup(x => x.PerformRightArrayComparison(ed, leftArg, rightArg))
+                .Setup(x => x.EvaluateLeftSingleValueRightArrayExpression(ed, leftArg, rightArg))
                 .Returns(true);
 
             _target.Evaluate(ed, leftContext, rightContext);
 
             _argumentExtractorMock.Verify(x => x.ExtractSingleValueArgument(ed.LeftParameter, leftContext), Times.Once);
             _argumentExtractorMock.Verify(x => x.ExtractArrayArgument(ed.RightParameter, rightContext), Times.Once);
-            _expressionEvaluatorMock.Verify(x => x.PerformRightArrayComparison(ed, leftArg, rightArg), Times.Once);
+            _expressionEvaluatorMock.Verify(x => x.EvaluateLeftSingleValueRightArrayExpression(ed, leftArg, rightArg), Times.Once);
         }
     }
 }

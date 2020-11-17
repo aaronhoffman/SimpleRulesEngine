@@ -10,4 +10,12 @@
         LessThan = 5,
         LessThanOrEqual = 6,
     }
+
+    public static class NumericComparisonExtensions
+    {
+        public static bool HasValue(this NumericComparison numericComparison)
+        {
+            return numericComparison != NumericComparison.NotSet;
+        }
+    }
 }

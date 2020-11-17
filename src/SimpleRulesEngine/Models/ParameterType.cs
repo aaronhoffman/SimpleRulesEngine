@@ -17,6 +17,11 @@
 
     public static class ParameterTypeExtensions
     {
+        public static bool HasValue(this ParameterType parameterType)
+        {
+            return parameterType != ParameterType.NotSet;
+        }
+
         public static bool IsSingleValueParameterType(this ParameterType parameterType)
         {
             return

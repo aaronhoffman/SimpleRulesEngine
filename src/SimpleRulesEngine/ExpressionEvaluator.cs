@@ -24,30 +24,30 @@ namespace SimpleRulesEngine
             object leftArgument,
             object rightArgument)
         {
-            if (expressionDefinition.NumericComparison.HasValue
-                && expressionDefinition.TextComparison.HasValue)
+            if (expressionDefinition.NumericComparison.HasValue()
+                && expressionDefinition.TextComparison.HasValue())
             {
                 throw new SimpleRulesEngineException("Both NumericComparison and TextComparison have been set and only one is allowed.");
             }
 
-            if (expressionDefinition.NumericComparison.HasValue)
+            if (expressionDefinition.NumericComparison.HasValue())
             {
                 var leftArgumentNumber = Convert.ToDecimal(leftArgument);
                 var rightArgumentNumber = Convert.ToDecimal(rightArgument);
 
                 return PerformLeftSingleValueRightSingleValueNumericComparison(
-                    expressionDefinition.NumericComparison.Value,
+                    expressionDefinition.NumericComparison,
                     leftArgumentNumber,
                     rightArgumentNumber);
             }
 
-            if (expressionDefinition.TextComparison.HasValue)
+            if (expressionDefinition.TextComparison.HasValue())
             {
                 var leftArgumentText = Convert.ToString(leftArgument);
                 var rightArgumentText = Convert.ToString(rightArgument);
 
                 return PerformLeftSingleValueRightSingleValueTextComparison(
-                    expressionDefinition.TextComparison.Value,
+                    expressionDefinition.TextComparison,
                     leftArgumentText,
                     rightArgumentText);
             }
@@ -60,12 +60,12 @@ namespace SimpleRulesEngine
             IEnumerable<object> leftArgument,
             IEnumerable<object> rightArgument)
         {
-            if (!expressionDefinition.ArrayComparison.HasValue)
+            if (!expressionDefinition.ArrayComparison.HasValue())
             {
                 throw new SimpleRulesEngineException("ArrayComparison was not provided.");
             }
 
-            switch (expressionDefinition.ArrayComparison.Value)
+            switch (expressionDefinition.ArrayComparison)
             {
                 case ArrayComparison.ContainsAny:
                     return leftArgument.Intersect(rightArgument).Any();
@@ -83,7 +83,7 @@ namespace SimpleRulesEngine
             IEnumerable<object> leftArgument,
             object rightArgument)
         {
-            if (!expressionDefinition.ExpressionAggregationMethod.HasValue)
+            if (!expressionDefinition.ExpressionAggregationMethod.HasValue())
             {
                 throw new SimpleRulesEngineException("ExpressionAggregationMethod not provided.");
             }
@@ -107,12 +107,12 @@ namespace SimpleRulesEngine
             // todo: opportunity to consolidate.
             // e.g `IsAny` can be translated to `ContainsAny`
 
-            if (!expressionDefinition.ArrayComparison.HasValue)
+            if (!expressionDefinition.ArrayComparison.HasValue())
             {
                 throw new SimpleRulesEngineException("ArrayComparison must be provided.");
             }
 
-            switch (expressionDefinition.ArrayComparison.Value)
+            switch (expressionDefinition.ArrayComparison)
             {
                 case ArrayComparison.IsAny:
                     return rightArgument.Any(x => x.Equals(leftArgument));

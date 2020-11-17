@@ -8,4 +8,12 @@
         Max = 3,
         Avg = 4,
     }
+
+    public static class ArrayAggregationMethodExtensions
+    {
+        public static bool HasValue(this ArrayAggregationMethod arrayAggregationMethod)
+        {
+            return arrayAggregationMethod != ArrayAggregationMethod.NotSet;
+        }
+    }
 }

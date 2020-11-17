@@ -96,14 +96,14 @@ namespace SimpleRulesEngine
                 throw new SimpleRulesEngineException("The ParameterType of the Right Parameter is not a valid array type.");
             }
 
-            if (!expressionDefinition.ArrayComparison.HasValue)
+            if (!expressionDefinition.ArrayComparison.HasValue())
             {
                 throw new SimpleRulesEngineException("Both the Left and Right parameters are array type but a valid ArrayComparison was not provided.");
             }
 
             if (!expressionDefinition.ArrayComparison.IsValidArraysComparison())
             {
-                throw new SimpleRulesEngineException($"Array Comparison of [{expressionDefinition.ArrayComparison.Value.ToString()}] not valid when both parameters are arrays.");
+                throw new SimpleRulesEngineException($"Array Comparison of [{expressionDefinition.ArrayComparison.ToString()}] not valid when both parameters are arrays.");
             }
 
             var leftArgument = _argumentExtractor.ExtractArrayArgument(expressionDefinition.LeftParameter, leftContext);

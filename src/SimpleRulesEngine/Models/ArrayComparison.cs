@@ -36,13 +36,21 @@
 
     public static class ArrayComparisonExtensions
     {
-        public static bool IsValidArraysComparison(this ArrayComparison? arrayComparison)
+        public static bool HasValue(this ArrayComparison arrayComparison)
         {
-            return
-                arrayComparison.HasValue
-                && (arrayComparison.Value == ArrayComparison.ContainsAll
-                    || arrayComparison.Value == ArrayComparison.ContainsAny
-                    || arrayComparison.Value == ArrayComparison.DoesNotContainAny);
+            return arrayComparison != ArrayComparison.NotSet;
+        }
+
+        /// <summary>
+        /// Value is a valid Left Array <> Right Array comparison value.
+        /// </summary>
+        /// <param name="arrayComparison"></param>
+        /// <returns></returns>
+        public static bool IsValidArraysComparison(this ArrayComparison arrayComparison)
+        {
+            return arrayComparison == ArrayComparison.ContainsAll
+                || arrayComparison == ArrayComparison.ContainsAny
+                || arrayComparison == ArrayComparison.DoesNotContainAny;
         }
     }
 }

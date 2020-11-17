@@ -9,4 +9,12 @@
         EndsWith = 4,
         Contains = 5,
     }
+
+    public static class TextComparisonExtensions
+    {
+        public static bool HasValue(this TextComparison textComparison)
+        {
+            return textComparison != TextComparison.NotSet;
+        }
+    }
 }

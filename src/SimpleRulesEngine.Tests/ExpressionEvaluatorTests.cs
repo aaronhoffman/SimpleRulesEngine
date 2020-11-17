@@ -14,7 +14,7 @@ namespace SimpleRulesEngine.Tests
         {
             _target = new ExpressionEvaluator();
         }
-
+        
         [TestMethod]
         public void Evaluator_GivenLeftSingleValueAndRightSingleValue_EvaluatesCorrectly()
         {
@@ -32,7 +32,7 @@ namespace SimpleRulesEngine.Tests
             TestHelper(ed, TextComparison.Contains, "ABC", "B", true);
             TestHelper(ed, TextComparison.Contains, "ABC", "D", false);
 
-            ed.TextComparison = null;
+            ed.TextComparison = TextComparison.NotSet;
 
             // numeric
             TestHelper(ed, NumericComparison.Equal, 1, 1, true);
@@ -141,7 +141,7 @@ namespace SimpleRulesEngine.Tests
             TestHelper(ed, NumericComparison.LessThanOrEqual, a2, 0, false);
 
             // clear NumericComparison for Text tests
-            ed.NumericComparison = null;
+            ed.NumericComparison = NumericComparison.NotSet;
 
             var aa1 = new object[] { "ABC", "ABC", "ABC" };
             ed.ExpressionAggregationMethod = ExpressionAggregationMethod.All;
@@ -211,16 +211,16 @@ namespace SimpleRulesEngine.Tests
 
         private void TestHelper(ExpressionDefinition ed, NumericComparison numericComparison, object leftArgument, object rightArgument, bool expectedResult)
         {
-            ed.ArrayComparison = null;
-            ed.TextComparison = null;
+            ed.ArrayComparison = ArrayComparison.NotSet;
+            ed.TextComparison = TextComparison.NotSet;
             ed.NumericComparison = numericComparison;
             Assert.AreEqual(expectedResult, _target.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
 
         private void TestHelper(ExpressionDefinition ed, TextComparison textComparison, object leftArgument, object rightArgument, bool expectedResult)
         {
-            ed.ArrayComparison = null;
-            ed.NumericComparison = null;
+            ed.ArrayComparison = ArrayComparison.NotSet;
+            ed.NumericComparison = NumericComparison.NotSet;
             ed.TextComparison = textComparison;
             Assert.AreEqual(expectedResult, _target.EvaluateLeftSingleValueRightSingleValueExpression(ed, leftArgument, rightArgument));
         }
